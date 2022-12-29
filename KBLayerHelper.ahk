@@ -104,21 +104,17 @@ ReadIniFile()
     Loop 10
     {
         idx := A_Index - 1
-        ; IniRead Layer[%A_Index%], %script_ini%, Layers, Layer%idx%, % "0,0,500,500"
-        IniRead tmpLayer, %script_ini%, Layers, Layer%idx%, %idx%,Layer %idx%,./icons/ico/Number-%idx%.ico,./png/Layer-%idx%.png
+        IniRead tmpLayer, %script_ini%, Layers, Layer%idx%, Layer %idx%,./icons/ico/Number-%idx%.ico,./png/Layer-%idx%.png
 
         curArray := StrSplit(tmpLayer , ",")
-        curArray[1] := Trim(curArray[1]) ? Trim(curArray[1]) : idx
-        curArray[2] := Trim(curArray[2]) ? Trim(curArray[2]) : "Layer " Format("{:01}", idx)
-        curArray[3] := Trim(curArray[3]) ? Trim(curArray[3]) : "./icons/ico/Number-" Format("{:01}", idx) ".ico"
-        curArray[4] := Trim(curArray[4]) ? Trim(curArray[4]) : "./png/Layer-" Format("{:01}", idx) ".png"
+        curArray[1] := Trim(curArray[1]) ? Trim(curArray[1]) : "Layer " Format("{:01}", idx)
+        curArray[2] := Trim(curArray[2]) ? Trim(curArray[2]) : "./icons/ico/Number-" Format("{:01}", idx) ".ico"
+        curArray[3] := Trim(curArray[3]) ? Trim(curArray[3]) : "./png/Layer-" Format("{:01}", idx) ".png"
 
-        LayerArray[A_Index] := {idx:curArray[1], label:curArray[2], ico:curArray[3], image:curArray[4]}
+        LayerArray[A_Index] := {label:curArray[1], ico:curArray[2], image:curArray[3]}
 
     }
-
 }
-
 
 InputMsg(wParam, lParam) {
     Local r, h
@@ -149,14 +145,10 @@ HidMessageReceived(data, hidVendorID, hidProductID){
 
             SetTrayIcon(LayerArray[idx+1].ico)
 
-            ; SetTrayIcon(idx)
-
             If (DisplayLayout)
-                ; LayoutOSD(LayerNameArray[idx + 1])
                 LayoutOSD(LayerArray[idx + 1].label, LayerArray[idx + 1].image)
             If (DisplayLayerName)
                 LayerIndicatorOSD(LayerArray[idx + 1].label)
-                ; LayerIndicatorOSD(LayerNameArray[idx + 1])
 
         }
     }
@@ -197,8 +189,8 @@ LayerIndicatorOSD(key){
         Gui, indicatorLayer:Color, FF0000
         Gui, indicatorLayer:Margin, 0, 0
 
-        Gui, indicatorLayer:Add, Picture, x0 y0 w%width% h%height% vlayerNamePictureID AltSubmit BackgroundTrans , ./png/LayerBox.png
-        Gui, indicatorLayer:Font, s%LayerNameFontSize% cBlack, Verdana
+        ; Gui, indicatorLayer:Add, Picture, x0 y0 w%width% h%height% vlayerNamePictureID AltSubmit BackgroundTrans , ./png/LayerBox.png
+        Gui, indicatorLayer:Font, s%LayerNameFontSize% cWhite, Verdana
         Gui, indicatorLayer:Add, Text, x0 y0 w%width% h%height% BackGroundTrans Center vlayerNameTxtID,%key%
     }
     else
@@ -207,12 +199,11 @@ LayerIndicatorOSD(key){
     }
 
 
-    ; GuiControl, indicatorLayer:Move, layerNamePictureID, % "w"textWidth+20 "h"textHeight+20
 
     Gui, indicatorLayer:Show, x%xPlacement% y%yPlacement% NoActivate  AutoSize
     Winset, ExStyle, +0x20
-    WinSet, TransColor, FF0000 128
-    ; WinSet, Transparent, 128
+    ; WinSet, TransColor, FFFFFF 64
+    WinSet, Transparent, 128
 
 
     SetTimer, RemoveLayerIndicatorOSD, -%LayerNameDuration%
