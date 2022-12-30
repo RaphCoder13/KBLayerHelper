@@ -9,6 +9,7 @@ This Autohotkey script listen to QMK HID debug messages sent on layer changes an
 ![Screen capture](./pictures/KBLayerHelper-with-legendes.png)
 
 Layout image and layer name are always-on-top, click-through windows, their position and duration can be configured in the .ini file.
+
 The tray icon menu allow to activate/deactivate the display.
 
 ## Requirements

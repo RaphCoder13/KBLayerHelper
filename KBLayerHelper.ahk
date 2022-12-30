@@ -22,11 +22,10 @@ global NoDisplayTimeout, LockHotKey, LayerArray
 ; Ini file read
 ReadIniFile()
 
-
+; Set hotkey to disable timeout
 Hotkey, %LockHotKey%, ChangeNoDisplayTimeout, on
 
-
-
+; Construct tray icon menu
 Menu Tray, NoStandard
 Menu Tray, Add,  Show Layout,  ChangeDisplayLayout
 Menu Tray, Add,  Show Layer Name,  ChangeDisplayLayerName
@@ -110,6 +109,7 @@ ReadIniFile()
     }
 }
 
+
 InputMsg(wParam, lParam) {
     Local r, H
     Local iVendorID, iProductID, data
@@ -155,8 +155,6 @@ ShowLayerNameOSD(key){
     width := LayerNameSize.1
     height := LayerNameSize.2
 
-
-
     ComputePosition(LayerNamePosition.1, LayerNamePosition.2, width, height, xPlacement, yPlacement)
 
 
@@ -176,30 +174,21 @@ ShowLayerNameOSD(key){
     }
 
 
-
     Gui, indicatorLayer:Show, x%xPlacement% y%yPlacement% NoActivate  AutoSize
     Winset, ExStyle, +0x20
     ; WinSet, TransColor, FFFFFF 64
     WinSet, Transparent, 128
 
-
     SetTimer, HideLayerNameOSD, -%LayerNameDuration%
-
 
 }
 
  ShowLayoutOSD(key, image){
     static layoutNameID
     static layoutPicture
-    bgTopPadding = 40
-    bgWidthPadding = 50
 
     width := LayoutSize.1
     height := LayoutSize.2
-
-    padding := 20
-
-
 
     If  !WinExist("layoutGUI")
     {
@@ -224,9 +213,7 @@ ShowLayerNameOSD(key){
 
             GuiControl, layoutLayer:Move, layoutPicture, % "x"width/2-oWidth/2 "y"height-oHeight "w"oWidth "h"oHeight
 
-
         }
-
 
         Gui, Font, s%LayoutFontSize% cBlack, Verdana
         Gui, layoutLayer:Add, Text, y0 x0 w%width% h%height% BackGroundTrans Center vlayoutNameID, %key%
@@ -239,19 +226,21 @@ ShowLayerNameOSD(key){
     }
 
 
-
-
     ComputePosition(LayoutPosition.1, LayoutPosition.2, width, height, xPlacement, yPlacement)
 
     Gui, Show, x%xPlacement% y%yPlacement%  NoActivate AutoSize
     Winset, ExStyle, +0x20
     WinSet, Transparent, 128
+
     SetTimer, HideLayoutOSD, -%LayoutDuration%
 
 }
 
-
-ComputePosition(ix, iy, width, height,ByRef  x, ByRef y)
+; Calculate OSD screen position
+; if position >= 0 : from top/left of the screen
+; if position < 0 : from bottom/right
+; 'center' to center OSD on screen
+ComputePosition(ix, iy, width, height, ByRef  x, ByRef y)
 {
     if(ix = "center")
     {
@@ -294,24 +283,21 @@ HideLayerNameOSD()
 }
 
 
-;---------------------------------------------------------------------
-; Reload
-;---------------------------------------------------------------------
-Reload:
+; Reload the app
+Reload()
+{
 	Reload
-Return
+}
 
-;---------------------------------------------------------------------
-; Exit
-;---------------------------------------------------------------------
-Exit:
-
+; Exit the app
+Exit(){
 	ExitApp
-Return
+}
 
 
-
-ChangeDisplayLayout:
+; On tray menu action, change check mark and write .ini file
+ChangeDisplayLayout()
+{
 
     if(DisplayLayout)
     {
@@ -323,9 +309,12 @@ ChangeDisplayLayout:
         Menu, Tray, Check, Show Layout
     }
 	IniWrite %DisplayLayout%, %script_ini%, Layout, DisplayLayout
-Return
+}
 
-ChangeDisplayLayerName:
+
+; On tray menu action, change check mark and write .ini file
+ChangeDisplayLayerName()
+{
     if(DisplayLayerName)
     {
         DisplayLayerName := 0
@@ -336,9 +325,10 @@ ChangeDisplayLayerName:
         Menu, Tray, Check, Show Layer Name
     }
 	IniWrite %DisplayLayerName%, %script_ini%, LayerName, DisplayLayerName
-Return
+}
 
-ChangeNoDisplayTimeout:
+; On tray menu action, change check mark and write .ini file
+ChangeNoDisplayTimeout(){
     if(NoDisplayTimeout)
     {
         NoDisplayTimeout := 0
@@ -351,5 +341,5 @@ ChangeNoDisplayTimeout:
         Menu, Tray, Check, No timeout
     }
 	IniWrite %NoDisplayTimeout%, %script_ini%, General, NoDisplayTimeout
+}
 
-Return
