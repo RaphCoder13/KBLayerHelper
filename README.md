@@ -4,9 +4,12 @@ On Screen Display keyboard layer name and layout image for QMK - Autohotkey base
 
 ## Overview
 
-This Autohotkey script listen to QMK HID debug messages sent on layer changes and notifies the user by displaying the layer name, a layout image and the layer index on the tray icon.
+This Autohotkey script listen to QMK HID debug messages sent on layer changes and notifies the user by displaying the layer index on the tray icon, a layout image and the layer name.
 
 ![Screen capture](./pictures/KBLayerHelper-with-legendes.png)
+
+Layout image and layer name are always-on-top, click-through windows, their position and duration can be configured in the .ini file.
+The tray icon menu allow to activate/deactivate the display.
 
 ## Requirements
 
@@ -19,9 +22,9 @@ Download and install [Autohotkey v1.1+](http://www.ahkscript.org/).
 Download [AHKHID](https://github.com/jleb/AHKHID) and copy `AHKHID.ahk` in _autohotkey/lib_ folder.
 Clone this repo.
 
-In QMK, enable console mode (`CONSOLE_ENABLE = yes` in your `rules.mk`) and in your `keymap.c`, include print.h and add the following function :
+In QMK, enable console mode (`CONSOLE_ENABLE = yes` in your `rules.mk`) and in your `keymap.c`, include _print.h_ and add the following function :
 
-```
+```c++
 #include "print.h"
 
 
@@ -36,21 +39,22 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 ```
 
-Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID. You can retrieve it using Windows Hardware :
+Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID.
+You can retrieve it using [USBDeview from Nirsoft](http://www.nirsoft.net/utils/usb_devices_view.html) or the Windows Device Manager :
 ![Retrieve keyboard VID and PID](./pictures/Device_VID_PID.png)
 
 ### KBLayerHelper.ini
 
-```
+```ini
 [Device]
 VendorId = 0x414B
-ProductId=0x0001
+ProductId = 0x0001
 
 [General]
-; Layout and layer name remain on screen if DisplayLock is on
+; Layout and layer name remain on screen if NoDisplayTimeout is on
 ; Duration has no effect
-DisplayLock =0
-; Hotkey to enable/disable DisplayLock
+NoDisplayTimeout =0
+; Hotkey to enable/disable NoDisplayTimeout.
 LockHotKey =+^!#F12
 
 ; Display layout image, as configured in [Layers] section
@@ -87,11 +91,11 @@ FontSize = 20
 ;   - Layout image to display
 [Layers]
 ; Layer Name, icon file, help image
-; default values :
-; "Layer N", "./icons/ico/Number-N.ico", "./png/Layer-N.png"
+; default : Layer N, ./icons/ico/Number-N.ico, ./png/Layer-N.png
 Layer0 = Base, ,./png/0Base_Layer.png
 Layer1 = Azerty, ,./png/1Azerty_Layer.png
-Layer2 = Symbol, ,./png/2Symbol_Layer.png
-Layer3 = Num,,./png/3Numpad_Layer.png
+Layer2 = Symbols, ,./png/2Symbol_Layer.png
+Layer3 = Numbers, ,./png/3Numpad_Layer.png
 Layer4 = Nav, ,./png/4Nav_Layer.png
+
 ```

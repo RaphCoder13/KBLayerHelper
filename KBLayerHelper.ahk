@@ -7,8 +7,6 @@ script_author	:= "Raph.Coder"
 script_ini		:= A_ScriptDir "\" script_title ".ini"
 
 
-; SetFormat, INTEGER, H
-
 
 SetBatchLines, -1
 SetWorkingDir, %A_ScriptDir%
@@ -18,25 +16,21 @@ SetWorkingDir, %A_ScriptDir%
 global VendorId, ProductId
 global DisplayLayout, LayoutSize, LayoutPosition, LayoutFontSize, LayoutDuration
 global DisplayLayerName, LayerNameSize, LayerNamePosition, LayerNameFontSize, LayerNameDuration
-global DisplayLock, LockHotKey, LayerArray
-
-
-; DisplayLock := 0
-; LockHotKey = ^!NumLock
+global NoDisplayTimeout, LockHotKey, LayerArray
 
 
 ; Ini file read
 ReadIniFile()
 
 
-Hotkey, %LockHotKey%, ChangeDisplayLock, on
+Hotkey, %LockHotKey%, ChangeNoDisplayTimeout, on
 
 
 
 Menu Tray, NoStandard
-Menu Tray, Add,  Display Layout,  ChangeDisplayLayout
-Menu Tray, Add,  Display Layer Name,  ChangeDisplayLayerName
-Menu Tray, Add,  Lock Display,  ChangeDisplayLock
+Menu Tray, Add,  Show Layout,  ChangeDisplayLayout
+Menu Tray, Add,  Show Layer Name,  ChangeDisplayLayerName
+Menu Tray, Add,  No timeout,  ChangeNoDisplayTimeout
 
 Menu Tray, Add ; seperator
 Menu Tray, Add, Reload %script_title%, Reload
@@ -44,33 +38,33 @@ Menu Tray, Add, Exit %script_title%, Exit
 
 
 if DisplayLayout
-    Menu Tray, Check, Display Layout
+    Menu Tray, Check, Show Layout
 
 if DisplayLayerName
-    Menu Tray, Check, Display Layer Name
+    Menu Tray, Check, Show Layer Name
 
+if NoDisplayTimeout
+    Menu Tray, Check, No timeout
+
+
+;Set up the constants
+AHKHID_UseConstants()
+usagePage := 65329
+usage := 116
 
 Gui, mainGUI:New, +LastFound +AlwaysOnTop -Border -SysMenu -Caption +ToolWindow
 GuiHandle := WinExist()
 
+;Intercept WM_INPUT
+OnMessage(0x00FF, "InputMsg")
 
-
-AHKHID_UseConstants()
-
-OnMessage(0x00FF, "InputMsg", 5)
-
-usagePage := 65329
-usage := 116
-AHKHID_Register(usagePage, usage, GuiHandle, RIDEV_INPUTSINK)
+AHKHID_Register(usagePage, usage, GUIHANDLE, RIDEV_INPUTSINK)
 
 Gui, mainGUI:Show
+; Set tray icon of layer 0
 SetTrayIcon(LayerArray[1].ico)
 Return
 
-
-myLabel:
-MsgBox MyLabel
-return
 
 ReadIniFile()
 {
@@ -78,7 +72,7 @@ ReadIniFile()
     IniRead, VendorId, %script_ini%, Device, VendorId ,0x414B
     IniRead, ProductId, %script_ini%, Device, ProductId ,0x0001
 
-    IniRead, DisplayLock, %script_ini%, General, DisplayLock ,1
+    IniRead, NoDisplayTimeout, %script_ini%, General, NoDisplayTimeout ,0
     IniRead, LockHotKey, %script_ini%, General, LockHotKey ,!NumLock
 
 
@@ -101,7 +95,7 @@ ReadIniFile()
     IniRead, LayerNameDuration, %script_ini%, LayerName, Duration ,1000
 
     LayerArray := [{}]
-    Loop 10
+    Loop 16
     {
         idx := A_Index - 1
         IniRead tmpLayer, %script_ini%, Layers, Layer%idx%, Layer %idx%,./icons/ico/Number-%idx%.ico,./png/Layer-%idx%.png
@@ -117,7 +111,7 @@ ReadIniFile()
 }
 
 InputMsg(wParam, lParam) {
-    Local r, h
+    Local r, H
     Local iVendorID, iProductID, data
     Critical
 
@@ -130,31 +124,24 @@ InputMsg(wParam, lParam) {
 
         iVendorID := AHKHID_GetDevInfo(h, DI_HID_VENDORID,     True)
         iProductID :=  AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,    True)
-        HidMessageReceived(&uData + offset, iVendorID, iProductID)
+        If(iVendorID == VendorId and iProductID == ProductId)
+        {
+            mystring := StrGet(&uData + offset, "UTF-8")
+            If(SubStr(mystring, 1, 5) == "Layer"){
+                idx := SubStr(myString, 6)
 
+                SetTrayIcon(LayerArray[idx+1].ico)
+
+                If (DisplayLayout)
+                    ShowLayoutOSD(LayerArray[idx + 1].label, LayerArray[idx + 1].image)
+                If (DisplayLayerName)
+                    ShowLayerNameOSD(LayerArray[idx + 1].label)
+
+            }
+        }
     }
     return
 }
-
-HidMessageReceived(data, hidVendorID, hidProductID){
-    If(hidVendorID == VendorId and hidProductID == ProductId)
-    {
-        mystring := StrGet(data, "UTF-8")
-        If(SubStr(mystring, 1, 5) == "Layer"){
-            idx := SubStr(myString, 6)
-
-            SetTrayIcon(LayerArray[idx+1].ico)
-
-            If (DisplayLayout)
-                LayoutOSD(LayerArray[idx + 1].label, LayerArray[idx + 1].image)
-            If (DisplayLayerName)
-                LayerIndicatorOSD(LayerArray[idx + 1].label)
-
-        }
-    }
-
-}
-
 
 
 SetTrayIcon(iconname){
@@ -162,17 +149,7 @@ SetTrayIcon(iconname){
         Menu, Tray, Icon, %iconname%
 }
 
-GetTextSize(str, size, font,ByRef height,ByRef width)
-{
-    Gui temp: Font, s%size%, %font%
-    Gui temp:Add, Text, , %str%
-    GuiControlGet T, temp:Pos, Static1
-    Gui temp:Destroy
-    height = % TH
-    width = % TW
-}
-
-LayerIndicatorOSD(key){
+ShowLayerNameOSD(key){
     static layerNameTxtID, layerNamePictureID
 
     width := LayerNameSize.1
@@ -206,12 +183,12 @@ LayerIndicatorOSD(key){
     WinSet, Transparent, 128
 
 
-    SetTimer, RemoveLayerIndicatorOSD, -%LayerNameDuration%
+    SetTimer, HideLayerNameOSD, -%LayerNameDuration%
 
 
 }
 
- LayoutOSD(key, image){
+ ShowLayoutOSD(key, image){
     static layoutNameID
     static layoutPicture
     bgTopPadding = 40
@@ -269,7 +246,7 @@ LayerIndicatorOSD(key){
     Gui, Show, x%xPlacement% y%yPlacement%  NoActivate AutoSize
     Winset, ExStyle, +0x20
     WinSet, Transparent, 128
-    SetTimer, RemoveLayoutOSD, -%LayoutDuration%
+    SetTimer, HideLayoutOSD, -%LayoutDuration%
 
 }
 
@@ -300,20 +277,20 @@ ComputePosition(ix, iy, width, height,ByRef  x, ByRef y)
 
 }
 
-RemoveLayoutOSD()
+HideLayoutOSD()
 {
-    if( !DisplayLock)
+    if( !NoDisplayTimeout)
         Gui, layoutLayer:Hide
-    SetTimer, RemoveLayoutOSD, off
+    SetTimer, HideLayoutOSD, off
 }
 
 
-RemoveLayerIndicatorOSD()
+HideLayerNameOSD()
 {
 
-    if( !DisplayLock)
+    if( !NoDisplayTimeout)
         Gui, indicatorLayer:Hide
-    SetTimer, RemoveLayerIndicatorOSD, off
+    SetTimer, HideLayerNameOSD, off
 }
 
 
@@ -339,11 +316,11 @@ ChangeDisplayLayout:
     if(DisplayLayout)
     {
         DisplayLayout := 0
-        Menu, Tray, UnCheck, Display Layout
+        Menu, Tray, UnCheck, Show Layout
     }
     Else{
         DisplayLayout := 1
-        Menu, Tray, Check, Display Layout
+        Menu, Tray, Check, Show Layout
     }
 	IniWrite %DisplayLayout%, %script_ini%, Layout, DisplayLayout
 Return
@@ -352,27 +329,27 @@ ChangeDisplayLayerName:
     if(DisplayLayerName)
     {
         DisplayLayerName := 0
-        Menu, Tray, UnCheck, Display Layer Name
+        Menu, Tray, UnCheck, Show Layer Name
     }
     Else{
         DisplayLayerName := 1
-        Menu, Tray, Check, Display Layer Name
+        Menu, Tray, Check, Show Layer Name
     }
 	IniWrite %DisplayLayerName%, %script_ini%, LayerName, DisplayLayerName
 Return
 
-ChangeDisplayLock:
-    if(DisplayLock)
+ChangeNoDisplayTimeout:
+    if(NoDisplayTimeout)
     {
-        DisplayLock := 0
+        NoDisplayTimeout := 0
         Gui, indicatorLayer:Hide
         Gui, layoutLayer:Hide
-        Menu, Tray, UnCheck, Lock Display
+        Menu, Tray, UnCheck, No timeout
     }
     Else{
-        DisplayLock := 1
-        Menu, Tray, Check, Lock Display
+        NoDisplayTimeout := 1
+        Menu, Tray, Check, No timeout
     }
-	IniWrite %DisplayLock%, %script_ini%, General, DisplayLock
+	IniWrite %NoDisplayTimeout%, %script_ini%, General, NoDisplayTimeout
 
 Return
