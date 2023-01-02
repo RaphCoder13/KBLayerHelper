@@ -27,26 +27,26 @@ The QMK keymap must be modified to send debug messages (see below).
 
 -   In QMK, enable console mode (`CONSOLE_ENABLE = yes` in your `rules.mk`) and in your `keymap.c`, include _print.h_ and add the following function and update your firmware.
 
-```c++
-#include "print.h"
+    ```c++
+    #include "print.h"
 
 
-...
+    ...
 
-// Call on every layer change.
-// Send LayerN (N is layer index)
-// Used by Autohotkey to display current layer info.
-layer_state_t layer_state_set_user(layer_state_t state) {
-  uprintf("Layer%u", get_highest_layer(state));
-  return state;
-}
-```
+    // Call on every layer change.
+    // Send LayerN (N is layer index)
+    // Used by Autohotkey to display current layer info.
+    layer_state_t layer_state_set_user(layer_state_t state) {
+      uprintf("Layer%u", get_highest_layer(state));
+      return state;
+    }
+    ```
 
 -   Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID.
     Use the QMK toolbox to get these :
     ![QMK toolbox](./pictures/QMK_Device_VID_PID.png)
 
-You can also retrieve them using [USBDeview from Nirsoft](http://www.nirsoft.net/utils/usb_devices_view.html) or the Windows Device Manager.
+    You can also retrieve them using [USBDeview from Nirsoft](http://www.nirsoft.net/utils/usb_devices_view.html) or the Windows Device Manager.
 
 -   Edit the _layers_ section with your names and images.
 
