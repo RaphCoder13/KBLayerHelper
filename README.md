@@ -1,6 +1,6 @@
 # KBLayerHelper
 
-On Screen Display keyboard layer name and layout image for QMK - Autohotkey based
+On Screen Display of layer name and layout image for QMK keyboards - Autohotkey based.
 
 ## Overview
 
@@ -10,7 +10,9 @@ This Autohotkey script listen to QMK HID debug messages sent on layer changes an
 
 Layout image and layer name are always-on-top, click-through windows, their position and duration can be configured in the .ini file.
 
-The tray icon menu allow to activate/deactivate the display.
+The tray icon menu allow to activate/deactivate the layout or layer name display.
+
+Remark : Default layer changes are not taken into account.
 
 ## Requirements
 
@@ -41,8 +43,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 ```
 
 Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID.
-You can retrieve it using [USBDeview from Nirsoft](http://www.nirsoft.net/utils/usb_devices_view.html) or the Windows Device Manager :
-![Retrieve keyboard VID and PID](./pictures/Device_VID_PID.png)
+Use the QMK toolbox to get these :
+![QMK toolbox](./pictures/QMK_Device_VID_PID.png)
+
+You can also retrieve them using [USBDeview from Nirsoft](http://www.nirsoft.net/utils/usb_devices_view.html) or the Windows Device Manager.
 
 ### KBLayerHelper.ini
 
