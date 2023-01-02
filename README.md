@@ -21,11 +21,11 @@ The QMK keymap must be modified to send debug messages (see below).
 
 ## Setup
 
-Download and install [Autohotkey v1.1+](http://www.ahkscript.org/).
-Download [AHKHID](https://github.com/jleb/AHKHID) and copy `AHKHID.ahk` in _autohotkey/lib_ folder.
-Clone this repo.
+-   Download and install [Autohotkey v1.1+](http://www.ahkscript.org/).
+-   Download [AHKHID](https://github.com/jleb/AHKHID) and copy `AHKHID.ahk` in _autohotkey/lib_ folder.
+    Clone this repo.
 
-In QMK, enable console mode (`CONSOLE_ENABLE = yes` in your `rules.mk`) and in your `keymap.c`, include _print.h_ and add the following function :
+-   In QMK, enable console mode (`CONSOLE_ENABLE = yes` in your `rules.mk`) and in your `keymap.c`, include _print.h_ and add the following function and update your firmware.
 
 ```c++
 #include "print.h"
@@ -42,11 +42,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 ```
 
-Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID.
-Use the QMK toolbox to get these :
-![QMK toolbox](./pictures/QMK_Device_VID_PID.png)
+-   Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID.
+    Use the QMK toolbox to get these :
+    ![QMK toolbox](./pictures/QMK_Device_VID_PID.png)
 
 You can also retrieve them using [USBDeview from Nirsoft](http://www.nirsoft.net/utils/usb_devices_view.html) or the Windows Device Manager.
+
+-   Edit the _layers_ section with your names and images.
 
 ### KBLayerHelper.ini
 
