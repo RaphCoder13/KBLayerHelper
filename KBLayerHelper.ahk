@@ -126,7 +126,7 @@ InputMsg(wParam, lParam) {
         iProductID :=  AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,    True)
         If(iVendorID == VendorId and iProductID == ProductId)
         {
-            mystring := StrGet(&uData + offset, "UTF-8")
+            mystring := Trim(StrGet(&uData + offset, "UTF-8"), OmitChars := " `t`n`r")
             If(SubStr(mystring, 1, 5) == "Layer"){
                 idx := SubStr(myString, 6)
 
