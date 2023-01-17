@@ -2,7 +2,7 @@
 #SingleInstance, Force
 
 script_title	:= "KBLayerHelper"
-script_version	:= "12/27/2022"
+script_version	:= "17/01/2023"
 script_author	:= "Raph.Coder"
 script_ini		:= A_ScriptDir "\" script_title ".ini"
 
@@ -55,13 +55,13 @@ Gui, mainGUI:New, +LastFound +AlwaysOnTop -Border -SysMenu -Caption +ToolWindow
 GuiHandle := WinExist()
 
 ;Intercept WM_INPUT
-OnMessage(0x00FF, "InputMsg")
+OnMessage(0x00FF, "InputMsg",2)
 
 AHKHID_Register(usagePage, usage, GUIHANDLE, RIDEV_INPUTSINK)
 
 Gui, mainGUI:Show
 ; Set tray icon of layer 0
-SetTrayIcon(LayerArray[1].ico)
+SetTrayIcon(LayerArray[0].ico)
 Return
 
 
@@ -94,25 +94,46 @@ ReadIniFile()
     IniRead, LayerNameDuration, %script_ini%, LayerName, Duration ,1000
 
     LayerArray := [{}]
-    Loop 16
+
+    ; Read all Layers section
+    IniRead, outputVarSection, %script_ini%, Layers
+
+    For array_idx, layerLine in StrSplit(outputVarSection, "`n", " `t")
     {
-        idx := A_Index - 1
-        IniRead tmpLayer, %script_ini%, Layers, Layer%idx%, Layer %idx%,./icons/ico/Number-%idx%.ico,./png/Layer-%idx%.png
+        local idx, cur_LayerArray
+        idx := array_idx - 1
 
-        curArray := StrSplit(tmpLayer , ",")
-        curArray[1] := Trim(curArray[1]) ? Trim(curArray[1]) : "Layer " Format("{:01}", idx)
-        curArray[2] := Trim(curArray[2]) ? Trim(curArray[2]) : "./icons/ico/Number-" Format("{:01}", idx) ".ico"
-        curArray[3] := Trim(curArray[3]) ? Trim(curArray[3]) : "./png/Layer-" Format("{:01}", idx) ".png"
+        ; Remove the 'key='' in front of the line by looking for the first =
+        ; Search for =
+        pos := InStr(layerLine, "=")
+        if pos > 0
+        {
+            layerLine := SubStr(layerLine, pos+1)
 
-        LayerArray[A_Index] := {label:curArray[1], ico:curArray[2], image:curArray[3]}
+            ; Split line with ,
+
+            cur_LayerArray := StrSplit(layerLine , ",", " `t")
+
+
+            layerRef := Trim(cur_LayerArray[1]) ? Trim(cur_LayerArray[1]) : Format("{:01}", idx)
+            ; Layer name
+            cur_LayerArray[2] := Trim(cur_LayerArray[2]) ? Trim(cur_LayerArray[2]) : "Layer " layerRef
+            ; Layer icon
+            cur_LayerArray[3] := Trim(cur_LayerArray[3]) ? Trim(cur_LayerArray[3]) : "./icons/ico/Number-" layerRef ".ico"
+            ; Layer image
+            cur_LayerArray[4] := Trim(cur_LayerArray[4]) ? Trim(cur_LayerArray[4]) : "./png/Layer-" layerRef ".png"
+
+            LayerArray[layerRef] := {label:cur_LayerArray[2], ico:cur_LayerArray[3], image:cur_LayerArray[4]}
+        }
 
     }
+
 }
 
 
 InputMsg(wParam, lParam) {
     Local r, H
-    Local iVendorID, iProductID, data
+    Local iVendorID, iProductID, data, mystring
     Critical
 
     r := AHKHID_GetInputInfo(lParam, II_DEVTYPE)
@@ -126,17 +147,22 @@ InputMsg(wParam, lParam) {
         iProductID :=  AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,    True)
         If(iVendorID == VendorId and iProductID == ProductId)
         {
-            mystring := Trim(StrGet(&uData + offset, "UTF-8"), OmitChars := " `t`n`r")
-            If(SubStr(mystring, 1, 5) == "Layer"){
-                idx := SubStr(myString, 6)
+            mystring := Trim(StrGet(&uData + offset, "UTF-8"), OmitChars := "`t`n`r")
+            Loop, Parse, mystring, `n, `r
+            {
+                foundPos := InStr(A_LoopField, "KBHLayer")
+                If(foundPos>0){
 
-                SetTrayIcon(LayerArray[idx+1].ico)
+                    idx := SubStr(A_LoopField, 8+foundPos)
 
-                If (DisplayLayout)
-                    ShowLayoutOSD(LayerArray[idx + 1].label, LayerArray[idx + 1].image)
-                If (DisplayLayerName)
-                    ShowLayerNameOSD(LayerArray[idx + 1].label)
+                    SetTrayIcon(LayerArray[idx].ico)
 
+                    If (DisplayLayout)
+                        ShowLayoutOSD(LayerArray[idx].label, LayerArray[idx].image)
+                    If (DisplayLayerName)
+                        ShowLayerNameOSD(LayerArray[idx].label)
+
+                }
             }
         }
     }
@@ -215,6 +241,8 @@ ShowLayerNameOSD(key){
 
         }
 
+
+
         Gui, Font, s%LayoutFontSize% cBlack, Verdana
         Gui, layoutLayer:Add, Text, y0 x0 w%width% h%height% BackGroundTrans Center vlayoutNameID, %key%
     }
@@ -223,16 +251,21 @@ ShowLayerNameOSD(key){
         GuiControl, layoutLayer:Text, layoutNameID, %key%
         if( FileExist(image))
             GuiControl,layoutLayer:, layoutPicture, %image%
+
     }
 
 
     ComputePosition(LayoutPosition.1, LayoutPosition.2, width, height, xPlacement, yPlacement)
 
-    Gui, Show, x%xPlacement% y%yPlacement%  NoActivate AutoSize
-    Winset, ExStyle, +0x20
-    WinSet, Transparent, 128
+    if (FileExist(image)){
+        Gui, Show, x%xPlacement% y%yPlacement%  NoActivate AutoSize
+        Winset, ExStyle, +0x20
+        WinSet, Transparent, 128
 
-    SetTimer, HideLayoutOSD, -%LayoutDuration%
+        SetTimer, HideLayoutOSD, -%LayoutDuration%
+    }
+    Else
+        HideLayoutOSD()
 
 }
 

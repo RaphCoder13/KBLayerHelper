@@ -30,16 +30,19 @@ The QMK keymap must be modified to send debug messages (see below).
     ```c++
     #include "print.h"
 
-
     ...
 
     // Call on every layer change.
-    // Send LayerN (N is layer index)
+    // Send KBHLayerN (N is layer index)
+    //      Add M if Swap Hands is active
     // Used by Autohotkey to display current layer info.
+
     layer_state_t layer_state_set_user(layer_state_t state) {
-      uprintf("Layer%u", get_highest_layer(state));
-      return state;
+        uprintf("KBHLayer%u%s\n", get_highest_layer(state), swap_hands ? "M" : "");
+        return state;
     }
+
+
     ```
 
 -   Edit `KBLayerHelper.ini` to fill your keyboard VendorID and ProductID.
@@ -93,16 +96,25 @@ FontSize = 20
 
 
 ; Define the layers :
+;   - Reference as passed by QMK : what follows 'KBHLayer', should be the 0-based layer index (with M if mirrored with Swap Hands)
 ;   - Name to use on the layout image and the label
 ;   - Icon used on the tray
 ;   - Layout image to display
 [Layers]
 ; Layer Name, icon file, help image
-; default : Layer N, ./icons/ico/Number-N.ico, ./png/Layer-N.png
-Layer0 = Base, ,./png/0Base_Layer.png
-Layer1 = Azerty, ,./png/1Azerty_Layer.png
-Layer2 = Symbols, ,./png/2Symbol_Layer.png
-Layer3 = Numbers, ,./png/3Numpad_Layer.png
-Layer4 = Nav, ,./png/4Nav_Layer.png
+; default values :
+; "Layer ref/index"Layer N", "./icons/ico/Number-N.ico", "./png/Layer-N.png"
+Layer= ,Base, ,./png/Base.png
+Layer= ,Azerty, ,./png/Azerty.png
+Layer= ,Game, ,./png/Game.png
+Layer= ,Symbols, ,./png/Symbol.png
+Layer= ,Numbers, ,./png/Numpad.png
+Layer= ,Nav, ,./png/Nav.png
+Layer= 0M,Base-M, ./icons/ico/Number-0.ico,./png/Base.png
+Layer= 1M,Azerty-M, ./icons/ico/Number-1.ico,./png/Azerty.png
+Layer= 2M,Game-M, ./icons/ico/Number-2.ico,./png/Game.png
+Layer= 3M,Symbols-M, ./icons/ico/Number-3.ico,./png/Symbol.png
+Layer= 4M,Numbers-M, ./icons/ico/Number-4.ico,./png/Numpad.png
+Layer= 5M,Nav-M, ./icons/ico/Number-5.ico,./png/Nav.png
 
 ```
