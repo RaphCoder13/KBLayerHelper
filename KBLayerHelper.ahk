@@ -4,7 +4,7 @@
 script_title	:= "KBLayerHelper"
 script_version	:= "17/01/2023"
 script_author	:= "Raph.Coder"
-script_ini		:= A_ScriptDir "\" script_title ".ini"
+global script_ini		:= A_ScriptDir "\" script_title ".ini"
 
 
 
@@ -14,16 +14,20 @@ SetWorkingDir, %A_ScriptDir%
 
 
 global VendorId, ProductId
-global DisplayLayout, LayoutSize, LayoutPosition, LayoutFontSize, LayoutDuration
-global DisplayLayerName, LayerNameSize, LayerNamePosition, LayerNameFontSize, LayerNameDuration
-global NoDisplayTimeout, LockHotKey, LayerArray
+global DisplayLayout, LayoutSize, LayoutPosition, LayoutFontSize, LayoutDuration, LayoutTransparency
+global DisplayLayerName, LayerNameSize, LayerNamePosition, LayerNameFontSize, LayerNameDuration, LayerNameTransparency
+global NoDisplayTimeout, LockHotKey, LayerArray, LayoutDisplayHotKey
+global MomentaryLayoutDisplayHotKey, MomentaryLayoutDisplayDuration, MomentaryTimerRunning
 
+MomentaryTimerRunning := 0
 
 ; Ini file read
 ReadIniFile()
 
 ; Set hotkey to disable timeout
 Hotkey, %LockHotKey%, ChangeNoDisplayTimeout, on
+Hotkey, %LayoutDisplayHotKey%, ChangeDisplayLayout, on
+Hotkey, %MomentaryLayoutDisplayHotKey%, MomentaryLayoutDisplay, on
 
 ; Construct tray icon menu
 Menu Tray, NoStandard
@@ -43,7 +47,7 @@ if DisplayLayerName
     Menu Tray, Check, Show Layer Name
 
 if NoDisplayTimeout
-    Menu Tray, Check, No timeout
+    Menu Tray, Check, No timeoutr
 
 
 ;Set up the constants
@@ -55,7 +59,7 @@ Gui, mainGUI:New, +LastFound +AlwaysOnTop -Border -SysMenu -Caption +ToolWindow
 GuiHandle := WinExist()
 
 ;Intercept WM_INPUT
-OnMessage(0x00FF, "InputMsg",2)
+OnMessage(0x00FF, "InputMsg",1)
 
 AHKHID_Register(usagePage, usage, GUIHANDLE, RIDEV_INPUTSINK)
 
@@ -73,6 +77,9 @@ ReadIniFile()
 
     IniRead, NoDisplayTimeout, %script_ini%, General, NoDisplayTimeout ,0
     IniRead, LockHotKey, %script_ini%, General, LockHotKey ,!NumLock
+    IniRead, LayoutDisplayHotKey, %script_ini%, General, LayoutDisplayHotKey ,+^!#d
+    IniRead, MomentaryLayoutDisplayHotKey, %script_ini%, General, MomentaryLayoutDisplayHotKey ,+^!#f
+    IniRead, MomentaryLayoutDisplayDuration, %script_ini%, General, MomentaryLayoutDisplayDuration, 1000
 
 
     IniRead, DisplayLayout, %script_ini%, Layout, DisplayLayout ,1
@@ -81,7 +88,7 @@ ReadIniFile()
     IniRead, inisize, %script_ini%, Layout, Size , 300,200
     LayoutSize := StrSplit(inisize, ",", " `t")
     IniRead, LayoutFontSize, %script_ini%, Layout, FontSize , 20
-
+    IniRead, LayoutTransparency, %script_ini%, Layout, Transparency , 128
 
     IniRead, LayoutDuration, %script_ini%, Layout, Duration ,1000
 
@@ -92,6 +99,7 @@ ReadIniFile()
     LayerNameSize := StrSplit(inisize, ",", " `t")
     IniRead, LayerNameFontSize, %script_ini%, LayerName, FontSize , 20
     IniRead, LayerNameDuration, %script_ini%, LayerName, Duration ,1000
+    IniRead, LayerNameTransparency, %script_ini%, LayerName, Transparency ,128
 
     LayerArray := [{}]
 
@@ -131,10 +139,11 @@ ReadIniFile()
 }
 
 
-InputMsg(wParam, lParam) {
+InputMsg(wParam, lParam, msg) {
     Local r, H
     Local iVendorID, iProductID, data, mystring
     Critical
+
 
     r := AHKHID_GetInputInfo(lParam, II_DEVTYPE)
 
@@ -143,10 +152,12 @@ InputMsg(wParam, lParam) {
         r := AHKHID_GetInputData(lParam, uData)
         offset := 0x1
 
+
         iVendorID := AHKHID_GetDevInfo(h, DI_HID_VENDORID,     True)
         iProductID :=  AHKHID_GetDevInfo(h, DI_HID_PRODUCTID,    True)
         If(iVendorID == VendorId and iProductID == ProductId)
         {
+            orgString:= StrGet(&uData + offset, "UTF-8")
             mystring := Trim(StrGet(&uData + offset, "UTF-8"), OmitChars := "`t`n`r")
             Loop, Parse, mystring, `n, `r
             {
@@ -154,7 +165,6 @@ InputMsg(wParam, lParam) {
                 If(foundPos>0){
 
                     idx := SubStr(A_LoopField, 8+foundPos)
-
                     SetTrayIcon(LayerArray[idx].ico)
 
                     If (DisplayLayout)
@@ -203,7 +213,7 @@ ShowLayerNameOSD(key){
     Gui, indicatorLayer:Show, x%xPlacement% y%yPlacement% NoActivate  AutoSize
     Winset, ExStyle, +0x20
     ; WinSet, TransColor, FFFFFF 64
-    WinSet, Transparent, 128
+    WinSet, Transparent, %LayerNameTransparency%
 
     SetTimer, HideLayerNameOSD, -%LayerNameDuration%
 
@@ -260,9 +270,12 @@ ShowLayerNameOSD(key){
     if (FileExist(image)){
         Gui, Show, x%xPlacement% y%yPlacement%  NoActivate AutoSize
         Winset, ExStyle, +0x20
-        WinSet, Transparent, 128
+        WinSet, Transparent, %LayoutTransparency%
 
         SetTimer, HideLayoutOSD, -%LayoutDuration%
+        if(MomentaryTimerRunning)
+            SetTimer, StopMomentaryDisplay, -%MomentaryLayoutDisplayDuration%
+
     }
     Else
         HideLayoutOSD()
@@ -327,7 +340,23 @@ Exit(){
 	ExitApp
 }
 
+MomentaryLayoutDisplay()
+{
+    if(!DisplayLayout)
+    {
+        SetTimer, StopMomentaryDisplay, -%MomentaryLayoutDisplayDuration%
+        DisplayLayout := 1
+        MomentaryTimerRunning := 1
+    }
+}
 
+StopMomentaryDisplay()
+{
+    SetTimer, StopMomentaryDisplay, off
+    if(MomentaryTimerRunning)
+        DisplayLayout := 0
+    MomentaryTimerRunning := 0
+}
 ; On tray menu action, change check mark and write .ini file
 ChangeDisplayLayout()
 {
