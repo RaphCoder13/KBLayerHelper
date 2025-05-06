@@ -1,0 +1,319 @@
+﻿{
+    "Device": {
+        "ProductId": "0x0003",
+        "VendorId": "0x5244"
+    },
+    "Devices": [
+        {
+            "Layers": [
+                {
+                    "Icon": "./icons/myIcons/base.ico",
+                    "Image": "./png/Birdy44/Base.png",
+                    "Name": "Colemak",
+                    "Reference": "0"
+                },
+                {
+                    "Icon": "./icons/myIcons/Game.ico",
+                    "Image": "./png/Birdy44/Game.png",
+                    "Name": "Game",
+                    "Reference": "1"
+                },
+                {
+                    "Icon": "./icons/myIcons/Symbol.ico",
+                    "Image": "./png/Birdy44/Symbol.png",
+                    "Name": "Symbols",
+                    "Reference": "2"
+                },
+                {
+                    "Icon": "./icons/myIcons/Numbers.ico",
+                    "Image": "./png/Birdy44/Num.png",
+                    "Name": "Numbers",
+                    "Reference": "3"
+                },
+                {
+                    "Icon": "./icons/myIcons/Nav.ico",
+                    "Image": "./png/Birdy44/Nav.png",
+                    "Name": "Nav",
+                    "Reference": "4"
+                },
+                {
+                    "Icon": "./icons/myIcons/Fun.ico",
+                    "Image": "./png/Birdy44/Func.png",
+                    "Name": "F Keys",
+                    "Reference": "5"
+                },
+                {
+                    "Icon": "./icons/myIcons/Apps.ico",
+                    "Image": "./png/Birdy44/Apps.png",
+                    "Name": "Apps",
+                    "Reference": "6"
+                },
+                {
+                    "Icon": "./icons/myIcons/Mouse.ico",
+                    "Image": "./png/Birdy44/Mouse.png",
+                    "Name": "Mouse",
+                    "Reference": "7"
+                },
+                {
+                    "Icon": "./icons/myIcons/Numbers.ico",
+                    "Image": "./png/Birdy44/Excel.png",
+                    "Name": "Excel",
+                    "Reference": "8"
+                },
+                {
+                    "Icon": "./icons/myIcons/Accents.ico",
+                    "Image": "./png/Birdy44/Accent.png",
+                    "Name": "AccentCol",
+                    "Reference": "9"
+                },
+                {
+                    "Icon": "./icons/myIcons/Accents.ico",
+                    "Image": "./png/Birdy44/Accent.png",
+                    "Name": "AccentErg",
+                    "Reference": "10"
+                },
+                {
+                    "Icon": "./icons/myIcons/baseM.ico",
+                    "Image": "./png/Birdy44/Base.png",
+                    "Name": "Colemak-M",
+                    "Reference": "0M"
+                },
+                {
+                    "Icon": "./icons/myIcons/GameM.ico",
+                    "Image": "./png/Birdy44/Game.png",
+                    "Name": "Game-M",
+                    "Reference": "1M"
+                },
+                {
+                    "Icon": "./icons/myIcons/SymbolM.ico",
+                    "Image": "./png/Birdy44/Symbol.png",
+                    "Name": "Symbols-M",
+                    "Reference": "2M"
+                },
+                {
+                    "Icon": "./icons/myIcons/NumbersM.ico",
+                    "Image": "./png/Birdy44/Num.png",
+                    "Name": "Numbers-M",
+                    "Reference": "3M"
+                },
+                {
+                    "Icon": "./icons/myIcons/NavM.ico",
+                    "Image": "./png/Birdy44/Nav.png",
+                    "Name": "Nav-M",
+                    "Reference": "4M"
+                },
+                {
+                    "Icon": "./icons/myIcons/FunM.ico",
+                    "Image": "./png/Birdy44/Func.png",
+                    "Name": "F Keys-M",
+                    "Reference": "5M"
+                },
+                {
+                    "Icon": "./icons/myIcons/AppsM.ico",
+                    "Image": "./png/Birdy44/Apps.png",
+                    "Name": "Apps-M",
+                    "Reference": "6M"
+                },
+                {
+                    "Icon": "./icons/myIcons/MouseM.ico",
+                    "Image": "./png/Birdy44/Mouse.png",
+                    "Name": "Mouse-M",
+                    "Reference": "7M"
+                },
+                {
+                    "Icon": "./icons/myIcons/NumbersM.ico",
+                    "Image": "./png/Birdy44/Excel.png",
+                    "Name": "Excel-M",
+                    "Reference": "8M"
+                },
+                {
+                    "Icon": "./icons/myIcons/Accents.ico",
+                    "Image": "./png/Birdy44/Accent.png",
+                    "Name": "AccentCol",
+                    "Reference": "9M"
+                }
+            ],
+            "Name": "Birdy44",
+            "ProductIds": [
+                "0x0002",
+                "0x0003",
+                "0x0003"
+            ]
+        },
+        {
+            "Layers": [
+                {
+                    "Name": "Colemak",
+                    "Icon": "./icons/myIcons/base.ico",
+                    "Reference": "0"
+                },
+                {
+                    "Name": "Colemak-M",
+                    "Icon":"./icons/myIcons/baseM.ico",
+                    "Reference": "1"
+                },
+                {
+                    "Name": "Accent OSS",
+                    "Icon":"./icons/myIcons/Accents.ico",
+                    "Image": "./png/Birdy44/Accent.png",
+                    "Reference": "2"
+                },
+                {
+                    "Name": "Accent",
+                    "Icon":"./icons/myIcons/Accents.ico",
+                    "Reference": "3"
+                },
+                {
+                    "Name": "Symbols",
+                    "Icon":"./icons/myIcons/Symbol.ico",
+                    "Reference": "4"
+                },
+                {
+                    "Name": "Numbers",
+                    "Icon":"./icons/myIcons/Numbers.ico",
+                    "Reference": "5"
+                },
+                {
+                    "Name": "Navigation",
+                    "Icon":"./icons/myIcons/Nav.ico",
+                    "Reference": "6"
+                },
+                {
+                    "Name": "Navigation-M",
+                    "Icon":"./icons/myIcons/NavM.ico",
+                    "Reference": "7"
+                },
+                {
+                    "Name": "F Keys",
+                    "Icon": "./icons/myIcons/Fun.ico",
+                    "Reference": "8"
+                },
+                {
+                    "Name": "Apps",
+                    "Icon":"./icons/myIcons/Apps.ico",
+                    "Reference": "9"
+                },
+                {
+                    "Name": "Mouse",
+                    "Icon":"./icons/myIcons/Mouse.ico",
+                    "Reference": "10"
+                },
+                {
+                    "Name": "Mouse-TP",
+                    "Icon":"./icons/myIcons/Mouse.ico",
+                    "Reference": "11"
+                },
+                {
+                    "Name": "Excel",
+                    "Icon":"./icons/myIcons/Numbers.ico",
+                    "Reference": "13"
+                },
+                {
+                    "Name": "Snake mod",
+                    "Reference": "14"
+                },
+                {
+                    "Name": "Camel mod",
+                    "Reference": "15"
+                },
+                {
+                    "Name": "Kebab",
+                    "Reference": "16"
+                },
+                {
+                    "Name": "Path mod",
+                    "Reference": "17"
+                },
+                {
+                    "Name": "Slash mod",
+                    "Reference": "18"
+                },
+                {
+                    "Name": "Numbers",
+                    "Icon":"./icons/myIcons/Numbers.ico",
+                    "Reference": "19"
+                },
+                {
+                    "Name": "Numbers",
+                    "Icon":"./icons/myIcons/Numbers.ico",
+                    "Reference": "20"
+                }
+                ,
+                {
+                    "Name": "Navigation",
+                    "Icon":"./icons/myIcons/Nav.ico",
+                    "Reference": "21"
+                }
+                ,
+                {
+                    "Name": "Navigation",
+                    "Icon":"./icons/myIcons/Nav.ico",
+                    "Reference": "22"
+                }
+                ,
+                {
+                    "Name": "Navigation-M",
+                    "Icon":"./icons/myIcons/NavM.ico",
+                    "Reference": "23"
+                }
+                ,
+                {
+                    "Name": "Navigation-M",
+                    "Icon":"./icons/myIcons/NavM.ico",
+                    "Reference": "24"
+                }
+                ,{
+                    "Name": "Excel",
+                    "Icon":"./icons/myIcons/Numbers.ico",
+                    "Reference": "25"
+                    },
+                {
+                    "Name": "Excel",
+                    "Icon":"./icons/myIcons/Numbers.ico",
+                    "Reference": "26"
+                }
+
+            ],
+            "Name": "Blocky",
+            "ProductIds": [
+                "0x0005",
+                "0x0006"
+            ]
+        }
+    ],
+    "General": {
+        "LayoutDisplayHotKey": "+^!#F11",
+        "LockHotKey": "+^!#F12",
+        "MomentaryLayoutDisplayDuration": 3001,
+        "MomentaryLayoutDisplayHotKey": "+^!#F10",
+        "NoDisplayTimeout": 0
+    },
+    "LayerName": {
+        "DisplayLayerName": 1,
+        "Duration": 3000,
+        "FontSize": 20,
+        "Position": [
+            -50,
+            -50
+        ],
+        "Size": [
+            200,
+            30
+        ],
+        "Transparency": 200
+    },
+    "Layout": {
+        "DisplayLayout": 0,
+        "Duration": 3000,
+        "FontSize": 24,
+        "Position": [
+            100,
+            -50
+        ],
+        "Size": [
+            966,
+            290
+        ],
+        "Transparency": 200
+    }
+}
